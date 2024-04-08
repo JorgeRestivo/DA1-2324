@@ -1,11 +1,23 @@
 By city:
-C_1-Porto Moniz 18
-C_2-São Vicente 34
-C_3-Santana 46
-C_4-Machico 137
-C_5-Santa Cruz 295
-C_6-Funchal 664
-C_7-Câmara de Lobos 225
-C_8-Ribeira Brava 89
-C_9-Ponta do Sol 59
-C_10-Calheta 76
+C_1-Alcacer do Sal 52
+C_2-Aveiro 515
+C_3-Beja 110
+C_4-Braga 1208
+C_5-Bragança 125
+C_6-Castelo Branco 230
+C_7-Coimbra 896
+C_8-Covilhã 100
+C_9-Estremoz 53
+C_10-Évora 220
+C_11-Faro 407
+C_12-Guarda 177
+C_13-Lagos 123
+C_14-Leiria 406
+C_15-Lisboa 12250
+C_16-Portalegre 96
+C_17-Porto 5650
+C_18-Santarém 200
+C_19-Setúbal 780
+C_20-Viana do Castelo 100
+C_21-Vila real 135
+C_22-Viseu 330

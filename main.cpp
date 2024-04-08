@@ -137,7 +137,7 @@ int main() {
     string reservoirFile = cityDataSet == 1 ? "Reservoirs_Madeira.csv" : "Reservoir.csv";
     string pumpingStationsFile = cityDataSet == 1 ? "Stations_Madeira.csv" : "Stations.csv";
     string citiesFile = cityDataSet == 1 ? "Cities_Madeira.csv" : "Cities.csv";
-    string pipesFile = cityDataSet == 1 ? "Pipes_Madeira.csv" : "Pipe.csv";
+    string pipesFile = cityDataSet == 1 ? "Pipes_Madeira.csv" : "Pipes.csv";
 
     Graph graph;
     Algorithms algorithm;
@@ -170,6 +170,7 @@ int main() {
     }
 
     // Add pipes as edges
+    // Add pipes as edges
     for (const auto& pipe : pipes) {
         Vertex* sourceVertex = graph.findVertex(pipe.getServicePointA());
         Vertex* destVertex = graph.findVertex(pipe.getServicePointB());
@@ -177,9 +178,12 @@ int main() {
         if (sourceVertex && destVertex) {
             sourceVertex->addBidirectionalEdge(destVertex, pipe.getCapacity(), pipe.getDirection());
         } else {
-            throw std::invalid_argument("One or both vertices not found for pipe edge");
+            std::cerr << "Warning: One or both vertices not found for pipe edge ("
+                      << pipe.getServicePointA() << " - " << pipe.getServicePointB() << ")" << std::endl;
+            continue; // Skip adding the edge and move to the next iteration
         }
     }
+
 
 
     unordered_map<string, City> cityMap;
