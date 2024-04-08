@@ -3,6 +3,7 @@
 #include "Graph.h"
 #include "Reservoir.h"
 #include "PumpingStation.h"
+#include "Pipe.h"
 
 namespace fs = std::__fs::filesystem;
 
@@ -38,17 +39,19 @@ int main() {
     string reservoirFile = cityDataSet == 1 ? "Reservoirs_Madeira.csv" : "Reservoir.csv";
     string pumpingStationsFile = cityDataSet == 1 ? "Stations_Madeira.csv" : "Stations.csv";
     string citiesFile = cityDataSet == 1 ? "Cities_Madeira.csv" : "Cities.csv";
-    string pipesFile = cityDataSet == 1 ? "Pipes_Madeira.csv" : "Pipes.csv";
+    string pipesFile = cityDataSet == 1 ? "Pipes_Madeira.csv" : "Pipe.csv";
 
     Graph graph;
     Reservoir r;
     PumpingStation p;
     City c;
+    Pipe pp;
 
     //Read the files
     vector<Reservoir> reservoirs = r.readFromCSV(baseDirectory + reservoirFile);
     vector<PumpingStation> pumpingStations = p.readFromCSV(baseDirectory + pumpingStationsFile);
     vector<City> cities = c.readFromCSV(baseDirectory + citiesFile);
+    vector<Pipe> pipes = pp.readFromCSV(baseDirectory + pipesFile);
 
     // Add reservoirs to the graph
     for (const auto& reservoir : reservoirs) {
@@ -63,6 +66,17 @@ int main() {
     // Add cities to the graph
     for (const auto& city : cities) {
         graph.addVertex(city);
+    }
+
+    for (const auto& pipe : pipes) {
+        Vertex* sourceVertex = graph.findVertex(pipe.getServicePointA());
+        Vertex* destVertex = graph.findVertex(pipe.getServicePointB());
+
+        // Check if both vertices are found
+        if (sourceVertex && destVertex) {
+            // Add an edge between the vertices (pipe direction is assumed to be 1)
+            sourceVertex->addEdge(destVertex, pipe.getCapacity(), 1);
+        }
     }
 
 

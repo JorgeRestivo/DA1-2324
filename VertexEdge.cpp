@@ -10,10 +10,10 @@ Vertex::Vertex(const PumpingStation& pumpingStation) : id(pumpingStation.getId()
 
 Vertex::Vertex(const City& city) : id(city.getId()) {}
 
-Edge * Vertex::addEdge(Vertex *d, int w, string s) {
-    auto newEdge = new Edge(this, d, w, s);
+Edge* Vertex::addEdge(Vertex* dest, int capacity, int direction) {
+    auto newEdge = new Edge(this, dest, capacity, direction);
     adj.push_back(newEdge);
-    d->incoming.push_back(newEdge);
+    dest->incoming.push_back(newEdge);
     return newEdge;
 }
 
@@ -53,7 +53,8 @@ void Vertex::setPath(Edge *path) {
 
 /********************** Edge  ****************************/
 
-Edge::Edge(Vertex *orig, Vertex *dest, int w, string service): orig(orig), dest(dest), weight(w), service(service) {}
+Edge::Edge(Vertex* orig, Vertex* dest, int capacity, int direction)
+        : orig(orig), dest(dest), capacity(capacity), direction(direction) {}
 
 Vertex * Edge::getDest() const {
     return this->dest;
@@ -75,6 +76,13 @@ double Edge::getFlow() const {
     return flow;
 }
 
+int Edge::getCapacity() const {
+    return capacity;
+}
+
+int Edge::getDirection() const {
+    return direction;
+}
 
 void Edge::setReverse(Edge *reverse) {
     this->reverse = reverse;
@@ -82,11 +90,6 @@ void Edge::setReverse(Edge *reverse) {
 
 void Edge::setFlow(double flow) {
     this->flow = flow;
-}
-
-bool Edge::isServiceTypeAlpha() const {
-    if (this->service[0] == 'A') return true;
-    return false;
 }
 
 void Edge::setWeight(int weight) {

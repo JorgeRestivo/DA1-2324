@@ -331,5 +331,3 @@ const unordered_map<std::string, Vertex *> & Graph::getVertexMap() const {
     return this->vertexMap;
 }
 
-
-#pragma clang diagnostic pop

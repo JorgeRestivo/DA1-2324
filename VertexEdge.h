@@ -88,7 +88,7 @@ public:
      * @param s
      * @returns a pointer to the new edge created
      */
-    Edge * addEdge(Vertex *dest, int w, string s);
+    Edge * addEdge(Vertex* dest, int capacity, int direction);
 
     /**
      * @brief Operator == Overload
@@ -139,7 +139,7 @@ public:
      * @param w
      * @param service
      */
-    Edge(Vertex *orig, Vertex *dest, int w, string service);
+    Edge(Vertex* orig, Vertex* dest, int capacity, int direction);
 
     /**
      * @brief Getter for destination station
@@ -159,6 +159,10 @@ public:
      */
     Vertex * getOrig() const;
 
+    int getCapacity() const;
+
+    int getDirection() const;
+
     /**
      * @brief Getter for the inverted edge of the current edge.
      * @returns The current edge but with the opposite direction (swapped destination and source stations)
@@ -170,12 +174,6 @@ public:
      * @returns the value of the flow
      */
     double getFlow() const;
-
-    /**
-     * @brief checks the type of service operating in the current line segment
-     * @returns true if the service type is ALFA PENDULAR and false otherwise
-     */
-    bool isServiceTypeAlpha() const;
 
     /**
      * @brief Sets the reverse edge
@@ -211,8 +209,10 @@ protected:
     /// The reverse edge of the current one
     Edge *reverse = nullptr;
 
-    /// type of service of a line segment
-    string service;
+    /// type of direction
+    int direction;
+
+    int capacity;
 
     /// for flow-related problems
     double flow;

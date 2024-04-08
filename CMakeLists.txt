@@ -16,4 +16,6 @@ add_executable(okda
         City.cpp
         City.h
         PumpingStation.cpp
-        PumpingStation.h)
+        PumpingStation.h
+        Pipe.h
+        Pipe.cpp)
