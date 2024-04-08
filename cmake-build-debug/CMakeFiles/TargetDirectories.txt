@@ -1,0 +1,3 @@
+/Users/leticiacoelho/Desktop/okda/cmake-build-debug/CMakeFiles/okda.dir
+/Users/leticiacoelho/Desktop/okda/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/leticiacoelho/Desktop/okda/cmake-build-debug/CMakeFiles/rebuild_cache.dir
