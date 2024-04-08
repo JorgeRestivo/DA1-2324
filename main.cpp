@@ -15,6 +15,7 @@ void displayMenu() {
     cout << "\n=== Menu ===\n" << endl;
     cout << "1. (2.1) Determine maximum water flow." << endl;
     cout << "2. (2.2) Determine Water Demand Vs Actual Flow" << endl;
+    cout << "4. (3.1) Evaluate the impact of removing a reservoir" << endl;
 }
 
 void performAction(Graph& graph, int choice, const unordered_map<string, City>& cityMap, const unordered_map<string, Reservoir>& reservoirMap) {
@@ -57,6 +58,24 @@ void performAction(Graph& graph, int choice, const unordered_map<string, City>& 
             }
             break;
         }
+        case 4: {
+            cout << "Enter the code of the reservoir: ";
+            string reservoirId;
+            cin >> reservoirId;
+
+            vector<string> affectedCities = Algorithms::simulateReservoirRemoval(graph, reservoirId, reservoirMap, cityMap);
+
+            if (affectedCities.empty()) {
+                cout << "No cities are affected or reservoir not found." << endl;
+            } else {
+                cout << "Affected cities:" << endl;
+                for (const auto& city : affectedCities) {
+                    cout << city << endl;
+                }
+            }
+
+            break;
+        }
 
         case 0:
             cout << "Exiting the program. Goodbye!" << endl;
@@ -82,6 +101,7 @@ int main() {
     string pipesFile = cityDataSet == 1 ? "Pipes_Madeira.csv" : "Pipe.csv";
 
     Graph graph;
+    Algorithms algorithm;
     Reservoir r;
     PumpingStation p;
     City c;

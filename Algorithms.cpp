@@ -125,3 +125,63 @@ bool Algorithms::compareCityCodes(const std::string& code1, const std::string& c
     return num1 < num2;
 }
 
+std::vector<std::string> Algorithms::simulateReservoirRemoval(Graph& graph, const std::string& reservoirCode, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities) {
+    createMainSource(graph, reservoirs);
+    createMainTarget(graph, cities);
+
+    // Save the original max flows to all cities
+    double originalMaxFlow = graph.edmondsKarp(graph.findVertex("SuperSource"), graph.findVertex("SuperSink"));
+    auto originalFlows = getMaxFlowToCities(graph, cities);
+
+    // Temporarily remove the specified reservoir by setting its delivery to 0
+    auto* reservoirVertex = graph.findVertex(reservoirCode);
+    if (!reservoirVertex) {
+        std::cerr << "Reservoir not found in the graph" << std::endl;
+        return {};
+    }
+
+    for (auto* edge : reservoirVertex->getAdj()) {
+        edge->setCapacity(0);
+    }
+
+    // Calculate the new max flows after the reservoir removal
+    graph.resetFlows(graph);
+    graph.edmondsKarp(graph.findVertex("SuperSource"), graph.findVertex("SuperSink"));
+    auto newFlows = getMaxFlowToCities(graph, cities);
+
+    // Restore the original capacity of the removed reservoir
+    for (auto* edge : reservoirVertex->getAdj()) {
+        edge->setCapacity(reservoirs.at(reservoirCode).getMaxDelivery());
+    }
+
+    // Identify cities whose water supply does not meet its demand
+    std::vector<std::string> affectedCities;
+    for (const auto& city : cities) {
+        double originalFlow = originalFlows[city.first];
+        double newFlow = newFlows[city.first];
+
+        if (newFlow < city.second.getDemand() && newFlow < originalFlow) {
+            affectedCities.push_back(city.first + " - " + city.second.getName() + " (Old Flow: " + std::to_string(originalFlow) + ", New Flow: " + std::to_string(newFlow) + ")");
+        }
+    }
+
+    return affectedCities;
+}
+
+std::unordered_map<std::string, double> Algorithms::getMaxFlowToCities(Graph& graph, const std::unordered_map<std::string, City>& cities) {
+    std::unordered_map<std::string, double> flows;
+
+    for (const auto& cityPair : cities) {
+        const std::string& cityCode = cityPair.first;
+        Vertex* cityVertex = graph.findVertex(cityCode);
+        if (cityVertex) {
+            double flowToCity = 0.0;
+            for (Edge* edge : cityVertex->getIncoming()) { // Assuming Vertex has a method to get incoming edges
+                flowToCity += edge->getFlow(); // Assuming Edge has a getFlow method
+            }
+            flows[cityCode] = flowToCity;
+        }
+    }
+
+    return flows;
+}

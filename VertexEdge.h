@@ -35,6 +35,7 @@ public:
      * @brief Constructor of the class, makes a vertex out of a Station object
      * @param station
      */
+    friend class Algorithms;
     explicit Vertex(const std::string& code, Type type);
     explicit Vertex(const Reservoir& reservoir, Type type);
     explicit Vertex(const PumpingStation& pumpingStation, Type type);
@@ -178,6 +179,8 @@ public:
      * @returns the value that correspond's to the current edge's weight
      */
     int getWeight() const;
+
+    void setCapacity(int newCapacity);
 
     /**
      * @brief Getter for origin station

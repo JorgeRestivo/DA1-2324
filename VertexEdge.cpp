@@ -16,7 +16,6 @@ Edge* Vertex::addEdge(Vertex* dest, int capacity, int direction) {
     auto newEdge = new Edge(this, dest, capacity, direction);
     adj.push_back(newEdge);
     dest->incoming.push_back(newEdge);
-    std::cout << "Added edge from vertex " << code << " to vertex " << dest->getCode() << std::endl;
     return newEdge;
 }
 
@@ -26,7 +25,6 @@ Edge* Vertex::addBidirectionalEdge(Vertex* dest, int capacity, int direction) {
     // Add edge from destination vertex to current vertex (if bidirectional)
     if (direction == 0) {
         dest->addEdge(this, capacity, direction);
-        std::cout << "Added bidirectional edge between vertex " << code << " and " << dest->getCode() << std::endl;
     }
     return edge1;
 }
@@ -112,6 +110,10 @@ double Edge::getFlow() const {
 
 int Edge::getCapacity() const {
     return capacity;
+}
+
+void Edge::setCapacity(int newCapacity) {
+    capacity = newCapacity;
 }
 
 int Edge::getDirection() const {

@@ -15,6 +15,10 @@ public:
     static void createMainTarget(Graph& graph, const unordered_map<string, City>& cities);
     static bool compareCityCodes(const std::string& code1, const std::string& code2);
     static double maxFlowToCity(Graph& graph, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities, const std::string& cityCode);
-};
+    vector<std::string> simulateReservoirRemoval(const std::string& reservoirCode);
+    static std::vector<std::string> simulateReservoirRemoval(Graph& graph, const std::string& reservoirCode, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities);
+    static std::unordered_map<std::string, double> getMaxFlowToCities(Graph& graph, const std::unordered_map<std::string, City>& cities);
+
+    };
 
 #endif // ALGORITHMS_H
