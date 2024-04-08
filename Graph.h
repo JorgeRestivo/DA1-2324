@@ -38,8 +38,10 @@ public:
     bool addVertex(const Reservoir& reservoir);
     bool addVertex(const PumpingStation& pumpingStation);
     bool addVertex(const City& city);
+    bool addVertex(Vertex* vertex);
 
     void printGraph(const Graph& graph);
+    void resetFlows(Graph& graph);
 
     /**
      * @brief Adds a bidirectional edge to a graph (this), given the contents of the source and destination vertices and the edge weight (w)

@@ -32,6 +32,12 @@ bool Graph::addVertex(const City& city) {
     return true;
 }
 
+bool Graph::addVertex(Vertex* vertex) {
+    if (!vertex || findVertex(vertex->getCode()) != nullptr)
+        return false;
+    vertexMap.insert({vertex->getCode(), vertex});
+    return true;
+}
 
 void deleteMatrix(int **m, int n) {
     if (m != nullptr) {
@@ -52,24 +58,37 @@ void deleteMatrix(double **m, int n) {
 }
 
 double Graph::edmondsKarp(Vertex* s, Vertex* t) {
-    if (s == nullptr || t == nullptr ||  s == t)
+    if (s == nullptr || t == nullptr || s == t)
         throw std::logic_error("Invalid source and/or target vertex");
 
     for (const auto& v : vertexMap) {
-        for (auto e: v.second->getAdj()) {
+        for (auto e : v.second->getAdj()) {
             e->setFlow(0);
         }
     }
 
     double maxFlow = 0;
-    while(findAugmentingPath(s, t)) {
+    while (findAugmentingPath(s, t)) {
         double f = findMinResidualAlongPath(s, t);
         augmentFlowAlongPath(s, t, f);
         maxFlow += f;
     }
 
+    // Calculate and save incoming flow for each city vertex
+    for (const auto& [key, v] : vertexMap) {
+        if (v->getType() == Type::CITY) {
+            double incomingFlow = 0;
+            for (auto e : v->getIncoming()) {
+                incomingFlow += e->getFlow();
+            }
+            v->setFlow(incomingFlow);  // Assuming Vertex class has a setFlow method
+        }
+    }
+
+
     return maxFlow;
 }
+
 
 void Graph::testAndVisit(std::queue< Vertex*> &q, Edge *e, Vertex *w, double residual) {
     if (! w->isVisited() && residual > 0) {
@@ -254,6 +273,14 @@ int Graph::fordFulkerson(Vertex *source, Vertex *target) const {
     }
     return maxFlow;
 
+}
+
+void Graph::resetFlows(Graph& graph) {
+    for (auto& [_, vertex] : graph.vertexMap) {
+        for (auto& edge : vertex->getAdj()) {
+            edge->setFlow(0);
+        }
+    }
 }
 
 bool Graph::bfs(Vertex *source, Vertex* sink) const {

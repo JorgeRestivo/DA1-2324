@@ -60,3 +60,75 @@ void Algorithms::printMaxFlowToAllCities(Graph& graph, const std::unordered_map<
         }
     }
 }
+
+
+void Algorithms::maxFlow(Graph& graph, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities) {
+    createMainSource(graph, reservoirs);
+    createMainTarget(graph, cities);
+
+    Vertex* superSource = graph.findVertex("SuperSource");
+    Vertex* superSink = graph.findVertex("SuperSink");
+
+    if (!superSource || !superSink) {
+        throw std::runtime_error("Super source or super sink not found in the graph");
+    }
+
+    double totalMaxFlow = graph.edmondsKarp(superSource, superSink);
+
+    // Define the output file name
+    string outputFile = "../output/output.txt";
+
+    // Write max flow values for each city to the output file
+    ofstream outputFileStream(outputFile);
+    if (!outputFileStream.is_open()) {
+        std::cerr << "Failed to open output file: " << outputFile << std::endl;
+        throw std::runtime_error("Failed to open output file");
+    }
+
+    for (const auto& [key, v] : graph.getVertexMap()) {
+        if (v->getType() == Type::CITY) {
+            outputFileStream << v->getCode() << "-" << " " << v->getFlow() << std::endl;
+        }
+    }
+
+    outputFileStream.close();
+
+    std::cout << "Total maximum flow from all reservoirs to all cities: " << totalMaxFlow << std::endl;
+}
+
+void Algorithms::createMainSource(Graph& graph, const unordered_map<string, Reservoir>& reservoirs) {
+    Vertex* superSource = new Vertex("SuperSource", Type::SUPER_SOURCE);
+    if (!graph.addVertex(superSource)) {
+        std::cerr << "Failed to add super source to graph" << std::endl;
+        delete superSource;  // Clean up if not added to graph
+        return;
+    }
+
+    for (const auto& [code, reservoir] : reservoirs) {
+        Vertex* reservoirVertex = graph.findVertex(reservoir.getCode());
+        if (reservoirVertex) {
+            // Use the . operator to access methods on reservoir object
+            superSource->addEdge(reservoirVertex, reservoir.getMaxDelivery(), 0);  // Assuming 0 for direction
+        } else {
+            std::cerr << "Reservoir vertex not found for code: " << code << std::endl;
+        }
+    }
+}
+
+
+void Algorithms::createMainTarget(Graph& graph, const unordered_map<string, City>& cities) {
+    Vertex* superSink = new Vertex("SuperSink", Type::SUPER_SINK);
+    if (!graph.addVertex(superSink)) {
+        std::cerr << "Failed to add super sink to graph" << std::endl;
+        delete superSink; // Clean up if not added to graph
+        return;
+    }
+
+    for (const auto& [cityCode, city] : cities) {
+        Vertex* cityVertex = graph.findVertex(cityCode);
+        if (cityVertex) {
+            cityVertex->addEdge(superSink, city.getDemand(), 0); // Assuming 0 for direction
+        }
+    }
+}
+

@@ -4,6 +4,8 @@
 
 /************************* Vertex  **************************/
 
+Vertex::Vertex(const std::string& code, Type type) : code(code), type(type) {}
+
 Vertex::Vertex(const Reservoir& reservoir, Type type) : code(reservoir.getCode()), type(type) {}
 
 Vertex::Vertex(const PumpingStation& pumpingStation, Type type) : code(pumpingStation.getCode()), type(type) {}
@@ -59,10 +61,21 @@ Type Vertex::getType() const{
     return this->type;
 }
 
+double Vertex::getMaxFlow() const {
+    return maxFlow;
+}
+
+double Vertex::getFlow() {
+    return flow;
+}
+
 void Vertex::setVisited(bool visited) {
     this->visited = visited;
 }
 
+void Vertex::setFlow(double flow) {
+    this->flow = flow;
+}
 
 void Vertex::setPath(Edge *path) {
     this->path = path;

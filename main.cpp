@@ -17,13 +17,17 @@ void displayMenu() {
     cout << "2. (2.1) Determine maximum water flow to a SPECIFIC city." << endl;
 }
 
-void performAction(Graph& graph, int choice, const unordered_map<string, City>& cityMap) {
+void performAction(Graph& graph, int choice, const unordered_map<string, City>& cityMap, const unordered_map<string, Reservoir>& reservoirMap) {
     std::string cityName;
     double maxFlow = 0;
     switch (choice) {
         case 1:
             cout << "Maximum water flow to all cities:" << endl;
-            Algorithms::printMaxFlowToAllCities(graph, cityMap);
+            //Algorithms::printMaxFlowToAllCities(graph, cityMap);
+
+
+            Algorithms::maxFlow(graph, reservoirMap, cityMap);
+
             break;
         case 2:
             cout << "Enter City Name (format C_X):";
@@ -105,12 +109,17 @@ int main() {
         cityMap[city.getCode()] = city;
     }
 
+    unordered_map<string, Reservoir> reservoirMap;
+    for (const auto& reservoir : reservoirs) {
+        reservoirMap[reservoir.getCode()] = reservoir;
+    }
+
     int choice;
     do {
         displayMenu();
         cout << "Enter your choice: ";
         cin >> choice;
-        performAction(graph, choice, cityMap); // Pass cityMap
+        performAction(graph, choice, cityMap, reservoirMap);
     } while (choice != 0);
 
     return 0;

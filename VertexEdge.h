@@ -24,7 +24,9 @@ class Edge;
 enum class Type {
     CITY,
     RESERVOIR,
-    PUMPING_STATION
+    PUMPING_STATION,
+    SUPER_SOURCE,
+    SUPER_SINK
 };
 
 class Vertex {
@@ -33,6 +35,7 @@ public:
      * @brief Constructor of the class, makes a vertex out of a Station object
      * @param station
      */
+    explicit Vertex(const std::string& code, Type type);
     explicit Vertex(const Reservoir& reservoir, Type type);
     explicit Vertex(const PumpingStation& pumpingStation, Type type);
     explicit Vertex(const City& city, Type type);
@@ -50,12 +53,19 @@ public:
      */
     std::string getCode() const;
 
+    double getMaxFlow() const;
+
     Type getType()const;
     /**
      * @brief Getter for the vertex's adjacency list
      * @returns vector of edges representing the adjacency list of vertex in question
      */
     vector<Edge *> getAdj() const;
+
+    double getFlow();
+
+    void setFlow(double flow);
+
 
     /**
      * @brief Signals if a determined vertex has already been visited or not in the context of a search algorithm.
@@ -109,6 +119,10 @@ protected:
 
     /// Identifier
     std::string code;
+
+    double flow;
+
+    double maxFlow;
 
     /// Outgoing edges
     std::vector<Edge *> adj;
