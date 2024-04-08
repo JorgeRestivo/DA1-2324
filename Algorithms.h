@@ -14,6 +14,7 @@ public:
     static void createMainSource(Graph& graph, const unordered_map<string, Reservoir>& reservoirs);
     static void createMainTarget(Graph& graph, const unordered_map<string, City>& cities);
     static bool compareCityCodes(const std::string& code1, const std::string& code2);
+    static double maxFlowToCity(Graph& graph, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities, const std::string& cityCode);
 };
 
 #endif // ALGORITHMS_H

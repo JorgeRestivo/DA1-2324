@@ -57,6 +57,26 @@ void Algorithms::maxFlow(Graph& graph, const unordered_map<string, Reservoir>& r
     std::cout << "If you want to see all the cities detail please search for file MaxFlowToEachCity.txt on Output folder." << std::endl;
 }
 
+double Algorithms::maxFlowToCity(Graph& graph, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities, const std::string& cityCode) {
+    createMainSource(graph, reservoirs);
+    createMainTarget(graph, cities);
+
+    Vertex* superSource = graph.findVertex("SuperSource");
+    Vertex* superSink = graph.findVertex("SuperSink");
+
+    if (!superSource || !superSink) {
+        throw std::runtime_error("Super source or super sink not found in the graph");
+    }
+
+    double totalMaxFlow = graph.edmondsKarp(superSource, superSink);
+
+    // Retrieve the max flow for the specific city
+    double maxFlowToCity = graph.getMaxFlowToCity(cityCode);
+
+    return maxFlowToCity;
+}
+
+
 void Algorithms::createMainSource(Graph& graph, const unordered_map<string, Reservoir>& reservoirs) {
     Vertex* superSource = new Vertex("SuperSource", Type::SUPER_SOURCE);
     if (!graph.addVertex(superSource)) {

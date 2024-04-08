@@ -40,6 +40,8 @@ public:
     bool addVertex(const City& city);
     bool addVertex(Vertex* vertex);
 
+    double getMaxFlowToCity(const std::string& cityCode);
+
     void printGraph(const Graph& graph);
     void resetFlows(Graph& graph);
 

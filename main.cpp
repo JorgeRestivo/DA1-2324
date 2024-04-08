@@ -14,7 +14,7 @@ using namespace std;
 void displayMenu() {
     cout << "\n=== Menu ===\n" << endl;
     cout << "1. (2.1) Determine maximum water flow." << endl;
-    cout << "2. (2.1) Determine maximum water flow to a SPECIFIC city." << endl;
+    cout << "2. (2.2) Determine Water Demand Vs Actual Flow" << endl;
 }
 
 void performAction(Graph& graph, int choice, const unordered_map<string, City>& cityMap, const unordered_map<string, Reservoir>& reservoirMap) {
@@ -25,6 +25,39 @@ void performAction(Graph& graph, int choice, const unordered_map<string, City>& 
             Algorithms::maxFlow(graph, reservoirMap, cityMap);
 
             break;
+        case 2: {
+            string cityCode;
+            cout << "Enter the code of the city: ";
+            cin >> cityCode;
+
+            double maxFlow = Algorithms::maxFlowToCity(graph, reservoirMap, cityMap, cityCode);
+            cout << "Maximum flow to city " << cityCode << ": " << maxFlow << endl;
+
+            // Find the city object with the given city code
+            City city;
+            for (const auto& pair : cityMap) {
+                if (pair.second.getCode() == cityCode) {
+                    city = pair.second;
+                    break;
+                }
+            }
+
+            if (city.getCode() != "") {
+                // Get the demand of the city
+                double cityDemand = city.getDemand();
+                // Calculate the deficit
+                double deficit = cityDemand - maxFlow;
+
+                // Output the results
+                cout << "City Demand: " << cityDemand << endl;
+                cout << "Maximum Flow to City: " << maxFlow << endl;
+                cout << "Deficit: " << deficit << endl;
+            } else {
+                cout << "City with code " << cityCode << " not found." << endl;
+            }
+            break;
+        }
+
         case 0:
             cout << "Exiting the program. Goodbye!" << endl;
             break;

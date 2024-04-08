@@ -150,16 +150,13 @@ void Graph::augmentFlowAlongPath(Vertex *s, Vertex *t, double f) {
     }
 }
 
-int Graph::maxFlow(Vertex* startStation, Vertex* endStation) {
-    double maxFlow = 0;
-    while (maxFlow == 0) {
-        double newFlow = edmondsKarp(startStation, endStation);
-        if (newFlow == 0) {
-            break;
-        }
-        maxFlow += newFlow;
+double Graph::getMaxFlowToCity(const std::string& cityCode) {
+    Vertex* cityVertex = findVertex(cityCode);
+    if (cityVertex) {
+        return cityVertex->getFlow();  // Assuming getFlow returns the max flow for the city
+    } else {
+        throw std::invalid_argument("City not found in the graph");
     }
-    return (int) maxFlow;
 }
 
 /*
