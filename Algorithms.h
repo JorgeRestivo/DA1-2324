@@ -10,10 +10,10 @@
 class Algorithms {
 public:
     static double getMaxFlowToCity(const std::string& cityCode, Graph& graph, const std::unordered_map<std::string, City>& cityMap);
-    static void printMaxFlowToAllCities(Graph& graph, const std::unordered_map<std::string, City>& cityMap);
     static void maxFlow(Graph& graph, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities);
     static void createMainSource(Graph& graph, const unordered_map<string, Reservoir>& reservoirs);
     static void createMainTarget(Graph& graph, const unordered_map<string, City>& cities);
+    static bool compareCityCodes(const std::string& code1, const std::string& code2);
 };
 
 #endif // ALGORITHMS_H

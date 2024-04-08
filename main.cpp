@@ -22,20 +22,8 @@ void performAction(Graph& graph, int choice, const unordered_map<string, City>& 
     double maxFlow = 0;
     switch (choice) {
         case 1:
-            cout << "Maximum water flow to all cities:" << endl;
-            //Algorithms::printMaxFlowToAllCities(graph, cityMap);
-
-
             Algorithms::maxFlow(graph, reservoirMap, cityMap);
 
-            break;
-        case 2:
-            cout << "Enter City Name (format C_X):";
-            cin >> cityName;
-            maxFlow = Algorithms::getMaxFlowToCity(cityName, graph, cityMap);
-            if (maxFlow != -1) {
-                cout << cityName << ": " << maxFlow << endl;
-            }
             break;
         case 0:
             cout << "Exiting the program. Goodbye!" << endl;
@@ -100,8 +88,6 @@ int main() {
             throw std::invalid_argument("One or both vertices not found for pipe edge");
         }
     }
-
-    graph.printGraph(graph);
 
 
     unordered_map<string, City> cityMap;

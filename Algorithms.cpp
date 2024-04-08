@@ -2,65 +2,8 @@
 #include "Algorithms.h"
 #include "Graph.h"
 #include <fstream>
-
-double Algorithms::getMaxFlowToCity(const std::string& cityCode, Graph& graph, const std::unordered_map<std::string, City>& cityMap) {
-    Vertex* cityVertex = nullptr;
-    for (const auto& entry : graph.getVertexMap()) {
-        if (entry.first == cityCode) {
-            cityVertex = entry.second;
-            break;
-        }
-    }
-
-    // Check if the city vertex was found
-    if (!cityVertex) {
-        cout << "City not found!" << endl;
-        return -1;
-    }
-
-    // Initialize total flow and retrieve city demand
-    double totalFlow = 0;
-    double cityDemand = -1; // Initialize to -1 in case city demand is not found
-    auto cityIt = cityMap.find(cityCode);
-    if (cityIt != cityMap.end()) {
-        cityDemand = cityIt->second.getDemand();
-    } else {
-        cout << "City demand not found for city code: " << cityCode << endl;
-        return -1;
-    }
-
-    // Iterate over all reservoir vertices to calculate maximum flow to the city
-    for (const auto& entry : graph.getVertexMap()) {
-        Vertex* source = entry.second;
-        if (source->getType() == Type::RESERVOIR) {
-            // Calculate maximum flow from reservoir to the city
-            double flow = graph.edmondsKarp(source, cityVertex);
-            totalFlow += flow;
-        }
-    }
-
-    // Adjust total flow if it exceeds city demand
-    if (totalFlow > cityDemand) {
-        totalFlow = cityDemand;
-    }
-
-    return totalFlow;
-}
-
-void Algorithms::printMaxFlowToAllCities(Graph& graph, const std::unordered_map<std::string, City>& cityMap) {
-    for (const auto& cityEntry : cityMap) {
-        const std::string& cityCode = cityEntry.first;
-        const City& city = cityEntry.second;
-
-        double maxFlow = getMaxFlowToCity(cityCode, graph, cityMap);
-
-        // Print the result for the current city
-        if (maxFlow != -1) {
-            std::cout << cityCode << " - " << city.getName() << " " << maxFlow << std::endl;
-        }
-    }
-}
-
+#include <algorithm>
+using namespace std;
 
 void Algorithms::maxFlow(Graph& graph, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities) {
     createMainSource(graph, reservoirs);
@@ -75,25 +18,43 @@ void Algorithms::maxFlow(Graph& graph, const unordered_map<string, Reservoir>& r
 
     double totalMaxFlow = graph.edmondsKarp(superSource, superSink);
 
-    // Define the output file name
-    string outputFile = "../output/output.txt";
+    // Define the Output file name
+    string outputFile = "../Output/MaxFlowToEachCity.txt";
 
-    // Write max flow values for each city to the output file
+    // Write max flow values for each city to the Output file
     ofstream outputFileStream(outputFile);
-    if (!outputFileStream.is_open()) {
-        std::cerr << "Failed to open output file: " << outputFile << std::endl;
-        throw std::runtime_error("Failed to open output file");
-    }
+    outputFileStream << "By city:" << std::endl;
 
+    // Create a vector to store the city vertices
+    std::vector<Vertex*> cityVertices;
+
+    // Collect city vertices into the vector
     for (const auto& [key, v] : graph.getVertexMap()) {
         if (v->getType() == Type::CITY) {
-            outputFileStream << v->getCode() << "-" << " " << v->getFlow() << std::endl;
+            cityVertices.push_back(v);
+        }
+    }
+
+    // Sort city vertices by their codes
+    std::sort(cityVertices.begin(), cityVertices.end(), [](const Vertex* a, const Vertex* b) {
+        return Algorithms::compareCityCodes(a->getCode(), b->getCode());
+    });
+
+    // Write city information to the output file
+    for (const auto& cityVertex : cityVertices) {
+        auto it = cities.find(cityVertex->getCode());
+        if (it != cities.end()) {
+            std::string cityName = it->second.getName();
+            outputFileStream << cityVertex->getCode() << "-" << cityName << " " << cityVertex->getFlow() << std::endl;
+        } else {
+            std::cerr << "City with code " << cityVertex->getCode() << " not found in the cities map." << std::endl;
         }
     }
 
     outputFileStream.close();
 
-    std::cout << "Total maximum flow from all reservoirs to all cities: " << totalMaxFlow << std::endl;
+    std::cout << "Total maximum flow: " << totalMaxFlow << " m3/sec." << std::endl;
+    std::cout << "If you want to see all the cities detail please search for file MaxFlowToEachCity.txt on Output folder." << std::endl;
 }
 
 void Algorithms::createMainSource(Graph& graph, const unordered_map<string, Reservoir>& reservoirs) {
@@ -130,5 +91,13 @@ void Algorithms::createMainTarget(Graph& graph, const unordered_map<string, City
             cityVertex->addEdge(superSink, city.getDemand(), 0); // Assuming 0 for direction
         }
     }
+}
+
+bool Algorithms::compareCityCodes(const std::string& code1, const std::string& code2) {
+    // Extract numeric part of the codes
+    int num1 = std::stoi(code1.substr(code1.find('_') + 1));
+    int num2 = std::stoi(code2.substr(code2.find('_') + 1));
+
+    return num1 < num2;
 }
 
