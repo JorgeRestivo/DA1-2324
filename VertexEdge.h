@@ -62,6 +62,8 @@ public:
      */
     vector<Edge *> getAdj() const;
 
+    void setAdj(const std::vector<Edge*>& adjacencyList);
+
     double getFlow();
 
     void setFlow(double flow);

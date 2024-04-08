@@ -73,6 +73,10 @@ void Vertex::setVisited(bool visited) {
     this->visited = visited;
 }
 
+void Vertex::setAdj(const std::vector<Edge*>& adjacencyList) {
+    adj = adjacencyList;
+}
+
 void Vertex::setFlow(double flow) {
     this->flow = flow;
 }

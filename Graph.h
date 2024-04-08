@@ -36,6 +36,7 @@ public:
      * @returns true if successful, and false if a vertex with that content already exists.
      */
     bool addVertex(const Reservoir& reservoir);
+    void removeVertex(Vertex* vertex);
     bool addVertex(const PumpingStation& pumpingStation);
     bool addVertex(const City& city);
     bool addVertex(Vertex* vertex);

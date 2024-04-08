@@ -57,6 +57,34 @@ void deleteMatrix(double **m, int n) {
     }
 }
 
+void Graph::removeVertex(Vertex* vertex) {
+    // Erase the vertex from the vertex map
+    auto it = vertexMap.find(vertex->getCode());
+    if (it != vertexMap.end()) {
+        vertexMap.erase(it);
+    }
+
+    // Remove edges connected to the vertex being removed from other vertices' adjacency lists
+    for (auto& [code, v] : vertexMap) {
+        // Get the list of adjacent vertices (neighbors) of the current vertex
+        auto adj = v->getAdj(); // Pass by value instead of by reference
+
+        // Remove the edges connected to the vertex being deleted from the adjacency list
+        adj.erase(std::remove_if(adj.begin(), adj.end(), [vertex](Edge* e) {
+            return e->getDest() == vertex || e->getOrig() == vertex;
+        }), adj.end());
+
+        // Assign the modified adjacency list back to the current vertex
+        v->setAdj(adj);
+    }
+
+    // Finally, delete the vertex object
+    delete vertex;
+}
+
+
+
+
 double Graph::edmondsKarp(Vertex* s, Vertex* t) {
     if (s == nullptr || t == nullptr || s == t)
         throw std::logic_error("Invalid source and/or target vertex");

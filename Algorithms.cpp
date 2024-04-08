@@ -53,6 +53,8 @@ void Algorithms::maxFlow(Graph& graph, const unordered_map<string, Reservoir>& r
 
     outputFileStream.close();
 
+    graph.removeVertex(superSource);
+    graph.removeVertex(superSink);
     std::cout << "Total maximum flow: " << totalMaxFlow << " m3/sec." << std::endl;
     std::cout << "If you want to see all the cities detail please search for file MaxFlowToEachCity.txt on Output folder." << std::endl;
 }
@@ -73,6 +75,8 @@ double Algorithms::maxFlowToCity(Graph& graph, const unordered_map<string, Reser
     // Retrieve the max flow for the specific city
     double maxFlowToCity = graph.getMaxFlowToCity(cityCode);
 
+    graph.removeVertex(superSource);
+    graph.removeVertex(superSink);
     return maxFlowToCity;
 }
 
