@@ -21,15 +21,21 @@ class Edge;
  * @brief Class that defines a graph's vertex
  */
 
+enum class Type {
+    CITY,
+    RESERVOIR,
+    PUMPING_STATION
+};
+
 class Vertex {
 public:
     /**
      * @brief Constructor of the class, makes a vertex out of a Station object
      * @param station
      */
-    explicit Vertex(const Reservoir& reservoir);
-    explicit Vertex(const PumpingStation& pumpingStation);
-    explicit Vertex(const City& city);
+    explicit Vertex(const Reservoir& reservoir, Type type);
+    explicit Vertex(const PumpingStation& pumpingStation, Type type);
+    explicit Vertex(const City& city, Type type);
 
     /**
      * @brief Operator < overload
@@ -42,13 +48,14 @@ public:
      * @brief Getter for Vertexe's identifier (Station's name)
      * @returns the station's name of the vertex it represents
      */
-    int getId() const;
+    std::string getCode() const;
 
+    Type getType()const;
     /**
      * @brief Getter for the vertex's adjacency list
      * @returns vector of edges representing the adjacency list of vertex in question
      */
-    const vector<Edge *> getAdj() const;
+    vector<Edge *> getAdj() const;
 
     /**
      * @brief Signals if a determined vertex has already been visited or not in the context of a search algorithm.
@@ -89,18 +96,19 @@ public:
      * @returns a pointer to the new edge created
      */
     Edge * addEdge(Vertex* dest, int capacity, int direction);
+    Edge *addBidirectionalEdge(Vertex *dest, int capacity, int direction);
 
     /**
      * @brief Operator == Overload
      */
     bool operator==(const Vertex& other) {
-        return this->id == other.id;
+        return this->code == other.code;
     }
 
 protected:
 
     /// Identifier
-    int id;
+    std::string code;
 
     /// Outgoing edges
     std::vector<Edge *> adj;
@@ -121,6 +129,8 @@ protected:
 
     /// required by MutablePriorityQueue and UFDS
     int queueIndex = 0;
+
+    Type type;
 };
 
 /********************** Edge ****************************/

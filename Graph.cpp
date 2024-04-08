@@ -12,7 +12,7 @@ Vertex * Graph::findVertex(const std::string &code) const {
 bool Graph::addVertex(const Reservoir& reservoir) {
     if (findVertex(reservoir.getCode()) != nullptr)
         return false;
-    vertexMap.insert({reservoir.getCode(), new Vertex(reservoir)});
+    vertexMap.insert({reservoir.getCode(), new Vertex(reservoir, Type::RESERVOIR)});
     return true;
 }
 
@@ -20,7 +20,7 @@ bool Graph::addVertex(const Reservoir& reservoir) {
 bool Graph::addVertex(const PumpingStation& pumpingStation) {
     if (findVertex(pumpingStation.getCode()) != nullptr)
         return false;
-    vertexMap.insert({pumpingStation.getCode(), new Vertex(pumpingStation)});
+    vertexMap.insert({pumpingStation.getCode(), new Vertex(pumpingStation, Type::PUMPING_STATION)});
     return true;
 }
 
@@ -28,21 +28,10 @@ bool Graph::addVertex(const PumpingStation& pumpingStation) {
 bool Graph::addVertex(const City& city) {
     if (findVertex(city.getCode()) != nullptr)
         return false;
-    vertexMap.insert({city.getCode(), new Vertex(city)});
+    vertexMap.insert({city.getCode(), new Vertex(city, Type::CITY)});
     return true;
 }
 
-/*bool Graph::addBidirectionalEdge(const Station &sourc, const Station &dest, const Connection& w) const {
-    auto v1 = findVertex(sourc.getName());
-    auto v2 = findVertex(dest.getName());
-    if (v1 == nullptr || v2 == nullptr)
-        return false;
-    auto e1 = v1->addEdge(v2, w.getCapacity(), w.getService());
-    auto e2 = v2->addEdge(v1, w.getCapacity(), w.getService());
-    e1->setReverse(e2);
-    e2->setReverse(e1);
-    return true;
-}*/
 
 void deleteMatrix(int **m, int n) {
     if (m != nullptr) {
@@ -101,7 +90,7 @@ bool Graph::findAugmentingPath(Vertex *s, Vertex *t) {
         auto v = q.front();
         q.pop();
         for(auto e: v->getAdj()) {
-            testAndVisit(q, e, e->getDest(), e->getWeight() - e->getFlow());
+            testAndVisit(q, e, e->getDest(), e->getCapacity() - e->getFlow());
         }
         for(auto e: v->getIncoming()) {
             testAndVisit(q, e, e->getOrig(), e->getFlow());
@@ -115,14 +104,15 @@ double Graph::findMinResidualAlongPath(Vertex *s, Vertex *t) {
     for (auto v = t; v != s; ) {
         auto e = v->getPath();
         if (e->getDest() == v) {
-            f = std::min(f, e->getWeight() - e->getFlow());
+            f = std::min(f, static_cast<double>(e->getCapacity() - e->getFlow()));
             v = e->getOrig();
         }
         else {
-            f = std::min(f, e->getFlow());
+            f = std::min(f, static_cast<double>(e->getFlow()));
             v = e->getDest();
         }
     }
+
     return f;
 }
 
@@ -331,3 +321,18 @@ const unordered_map<std::string, Vertex *> & Graph::getVertexMap() const {
     return this->vertexMap;
 }
 
+void Graph::printGraph(const Graph& graph) {
+    const auto& vertexMap = graph.getVertexMap();
+
+    for (const auto& entry : vertexMap) {
+        const std::string& vertexName = entry.first;
+        const Vertex* vertex = entry.second;
+
+        std::cout << "Vertex: " << vertexName << ", Adj Size: " << vertex->getIncoming().size() << std::endl;
+
+        const auto& edges = vertex->getAdj();
+        for (const auto& edge : edges) {
+            std::cout << "    Edge to: " << edge->getDest()->getCode() << ", Weight: " << edge->getWeight() << std::endl;
+        }
+    }
+}

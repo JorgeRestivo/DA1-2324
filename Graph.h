@@ -39,6 +39,8 @@ public:
     bool addVertex(const PumpingStation& pumpingStation);
     bool addVertex(const City& city);
 
+    void printGraph(const Graph& graph);
+
     /**
      * @brief Adds a bidirectional edge to a graph (this), given the contents of the source and destination vertices and the edge weight (w)
      * @details Time Complexity: O(1)

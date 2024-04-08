@@ -4,29 +4,42 @@
 
 /************************* Vertex  **************************/
 
-Vertex::Vertex(const Reservoir& reservoir) : id(reservoir.getId()) {}
+Vertex::Vertex(const Reservoir& reservoir, Type type) : code(reservoir.getCode()), type(type) {}
 
-Vertex::Vertex(const PumpingStation& pumpingStation) : id(pumpingStation.getId()) {}
+Vertex::Vertex(const PumpingStation& pumpingStation, Type type) : code(pumpingStation.getCode()), type(type) {}
 
-Vertex::Vertex(const City& city) : id(city.getId()) {}
+Vertex::Vertex(const City& city, Type type) : code(city.getCode()), type(type) {}
 
 Edge* Vertex::addEdge(Vertex* dest, int capacity, int direction) {
     auto newEdge = new Edge(this, dest, capacity, direction);
     adj.push_back(newEdge);
     dest->incoming.push_back(newEdge);
+    std::cout << "Added edge from vertex " << code << " to vertex " << dest->getCode() << std::endl;
     return newEdge;
 }
+
+Edge* Vertex::addBidirectionalEdge(Vertex* dest, int capacity, int direction) {
+    // Add edge from current vertex to destination vertex
+    Edge* edge1 = addEdge(dest, capacity, direction);
+    // Add edge from destination vertex to current vertex (if bidirectional)
+    if (direction == 0) {
+        dest->addEdge(this, capacity, direction);
+        std::cout << "Added bidirectional edge between vertex " << code << " and " << dest->getCode() << std::endl;
+    }
+    return edge1;
+}
+
 
 
 bool Vertex::operator<(Vertex & vertex) const {
     return this->dist < vertex.dist;
 }
 
-int Vertex::getId() const {
-    return this->id;
+std::string Vertex::getCode() const {
+    return this->code;
 }
 
-const vector<Edge *> Vertex::getAdj() const {
+vector<Edge *> Vertex::getAdj() const {
     return this->adj;
 }
 
@@ -40,6 +53,10 @@ Edge *Vertex::getPath() const {
 
 std::vector<Edge *> Vertex::getIncoming() const {
     return this->incoming;
+}
+
+Type Vertex::getType() const{
+    return this->type;
 }
 
 void Vertex::setVisited(bool visited) {

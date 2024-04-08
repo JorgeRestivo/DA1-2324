@@ -18,4 +18,6 @@ add_executable(okda
         PumpingStation.cpp
         PumpingStation.h
         Pipe.h
-        Pipe.cpp)
+        Pipe.cpp
+        Algorithms.cpp
+        Algorithms.h)

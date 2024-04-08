@@ -8,6 +8,7 @@ using namespace std;
 
 class City {
 public:
+    friend class Algorithms;
     // Constructors
     City();
     City(const string& name, int id, const string& code, double demand, const string& population);

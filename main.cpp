@@ -4,6 +4,7 @@
 #include "Reservoir.h"
 #include "PumpingStation.h"
 #include "Pipe.h"
+#include "Algorithms.h"
 
 namespace fs = std::__fs::filesystem;
 
@@ -13,11 +14,24 @@ using namespace std;
 void displayMenu() {
     cout << "\n=== Menu ===\n" << endl;
     cout << "1. (2.1) Determine maximum water flow." << endl;
+    cout << "2. (2.1) Determine maximum water flow to a SPECIFIC city." << endl;
 }
 
-void performAction(Graph& graph, int choice) {
+void performAction(Graph& graph, int choice, const unordered_map<string, City>& cityMap) {
+    std::string cityName;
+    double maxFlow = 0;
     switch (choice) {
         case 1:
+            cout << "Maximum water flow to all cities:" << endl;
+            Algorithms::printMaxFlowToAllCities(graph, cityMap);
+            break;
+        case 2:
+            cout << "Enter City Name (format C_X):";
+            cin >> cityName;
+            maxFlow = Algorithms::getMaxFlowToCity(cityName, graph, cityMap);
+            if (maxFlow != -1) {
+                cout << cityName << ": " << maxFlow << endl;
+            }
             break;
         case 0:
             cout << "Exiting the program. Goodbye!" << endl;
@@ -26,6 +40,7 @@ void performAction(Graph& graph, int choice) {
             cout << "Invalid choice. Please try again." << endl;
     }
 }
+
 
 int main() {
     // Prompt user to choose the dataset
@@ -60,7 +75,9 @@ int main() {
 
     // Add pumping stations to the graph
     for (const auto& pumpingStation : pumpingStations) {
-        graph.addVertex(pumpingStation);
+        if (!pumpingStation.getCode().empty()) {
+            graph.addVertex(pumpingStation);
+        }
     }
 
     // Add cities to the graph
@@ -68,25 +85,24 @@ int main() {
         graph.addVertex(city);
     }
 
+    // Add pipes as edges
     for (const auto& pipe : pipes) {
         Vertex* sourceVertex = graph.findVertex(pipe.getServicePointA());
         Vertex* destVertex = graph.findVertex(pipe.getServicePointB());
 
-        // Check if both vertices are found
         if (sourceVertex && destVertex) {
-            // Add an edge between the vertices (pipe direction is assumed to be 1)
-            sourceVertex->addEdge(destVertex, pipe.getCapacity(), 1);
+            sourceVertex->addBidirectionalEdge(destVertex, pipe.getCapacity(), pipe.getDirection());
+        } else {
+            throw std::invalid_argument("One or both vertices not found for pipe edge");
         }
     }
 
+    graph.printGraph(graph);
 
-    for (const auto& reservoir : reservoirs) {
-        cout << "Name: " << reservoir.getName() << endl;
-        cout << "Municipality: " << reservoir.getMunicipality() << endl;
-        cout << "ID: " << reservoir.getId() << endl;
-        cout << "Code: " << reservoir.getCode() << endl;
-        cout << "Max Delivery: " << reservoir.getMaxDelivery() << endl;
-        cout << "===============================" << endl;
+
+    unordered_map<string, City> cityMap;
+    for (const auto& city : cities) {
+        cityMap[city.getCode()] = city;
     }
 
     int choice;
@@ -94,8 +110,11 @@ int main() {
         displayMenu();
         cout << "Enter your choice: ";
         cin >> choice;
-        performAction(graph, choice);
+        performAction(graph, choice, cityMap); // Pass cityMap
     } while (choice != 0);
+
+    return 0;
+
 
     return 0;
 
