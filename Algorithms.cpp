@@ -161,7 +161,12 @@ std::vector<std::string> Algorithms::simulateReservoirRemoval(Graph& graph, cons
         double newFlow = newFlows[city.first];
 
         if (newFlow < city.second.getDemand() && newFlow < originalFlow) {
-            affectedCities.push_back(city.first + " - " + city.second.getName() + " (Old Flow: " + std::to_string(originalFlow) + ", New Flow: " + std::to_string(newFlow) + ")");
+            int originalFlowInt = static_cast<int>(originalFlow);  // Cast to int
+            int newFlowInt = static_cast<int>(newFlow);  // Cast to int
+
+            affectedCities.push_back(city.first + " - " + city.second.getName() +
+                                     " (Old Flow: " + std::to_string(originalFlowInt) +
+                                     ", New Flow: " + std::to_string(newFlowInt) + ")");
         }
     }
 

@@ -63,6 +63,11 @@ void performAction(Graph& graph, int choice, const unordered_map<string, City>& 
             string reservoirId;
             cin >> reservoirId;
 
+            if (!graph.findVertex(reservoirId)) {
+                cout << "Reservoir not found in the graph" << endl;
+                break;
+            }
+
             vector<string> affectedCities = Algorithms::simulateReservoirRemoval(graph, reservoirId, reservoirMap, cityMap);
 
             if (affectedCities.empty()) {
@@ -73,7 +78,6 @@ void performAction(Graph& graph, int choice, const unordered_map<string, City>& 
                     cout << city << endl;
                 }
             }
-
             break;
         }
 
