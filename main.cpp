@@ -16,10 +16,11 @@ void displayMenu() {
     cout << "1. (2.1) Determine maximum water flow." << endl;
     cout << "2. (2.2) Determine Water Demand Vs Actual Flow" << endl;
     cout << "4. (3.1) Evaluate the impact of removing a reservoir" << endl;
-    cout << "6. (3.3) Evaluate the impact of removing a pumping station" << endl;
+    cout << "5. (3.2) Evaluate the impact of removing a pumping station" << endl;
+    cout << "6. (3.3) Evaluate the impact of removing pipelines" << endl;
 }
 
-void performAction(Graph& graph, int choice, const unordered_map<string, City>& cityMap, const unordered_map<string, Reservoir>& reservoirMap) {
+void performAction(Graph& graph, int choice, const unordered_map<string, City>& cityMap, const unordered_map<string, Reservoir>& reservoirMap, const unordered_map<string, vector<Edge*>>& stationPipes) {
     std::string cityName;
     double maxFlow = 0;
     switch (choice) {
@@ -79,6 +80,20 @@ void performAction(Graph& graph, int choice, const unordered_map<string, City>& 
                     cout << city << endl;
                 }
             }
+            break;
+        }
+        case 5: {
+            std::string stationCode;
+            std::cout << "Enter the code of the pumping station to simulate removal: ";
+            std::cin >> stationCode;
+
+            auto affectedCities = Algorithms::simulatePumpingStationRemoval(graph, stationPipes, cityMap);
+
+            std::cout << "Affected cities after removing pumping station " << stationCode << ":" << std::endl;
+            for (const auto& result : affectedCities) {
+                std::cout << result << std::endl;
+            }
+
             break;
         }
         case 6: {
@@ -177,12 +192,14 @@ int main() {
         reservoirMap[reservoir.getCode()] = reservoir;
     }
 
+    auto stationPipes = algorithm.createStationPipes(graph);
+
     int choice;
     do {
         displayMenu();
         cout << "Enter your choice: ";
         cin >> choice;
-        performAction(graph, choice, cityMap, reservoirMap);
+        performAction(graph, choice, cityMap, reservoirMap, stationPipes);
     } while (choice != 0);
 
     return 0;

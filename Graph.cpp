@@ -187,119 +187,6 @@ double Graph::getMaxFlowToCity(const std::string& cityCode) {
     }
 }
 
-/*
-vector<vector<int>> Graph::dfs_graphCost(Graph &graph, Vertex &startStation, Vertex &endStation) {
-    vector<vector<int>> results;
-    vector<string> path;
-    double maxFlowSoFar = 0;
-    dfs_graphCostHelper(graph, startStation, endStation, path, results, maxFlowSoFar);
-    return results;
-}*/
-
-/*void Graph::dfs_graphCostHelper(Graph &graph, Vertex &current, Vertex &endStation, vector<string> &path, vector<vector<int>> &results, double &maxFlowSoFar) {
-    current.setVisited(true);
-    path.push_back(current.getName());
-
-
-    if (current == endStation) {
-        int numEdges = (int) path.size() - 1;
-        int numAlpha = 0;
-        int numStandard = 0;
-        int maxFlow = INT_MAX;
-
-        for (unsigned int i = 0; i < path.size() - 1; i++) {
-            Vertex *u = graph.findVertex(path[i]);
-            Vertex *v = graph.findVertex(path[i+1]);
-
-            for (auto e : u->getAdj()) {
-                if (e->getDest() == v) {
-                    if (e->isServiceTypeAlpha()) {
-                        numAlpha++;
-                    } else {
-                        numStandard++;
-                    }
-                    maxFlow = min(maxFlow, e->getWeight());
-                    break;
-                }
-            }
-        }
-
-        maxFlowSoFar = max(maxFlowSoFar, static_cast<double>(maxFlow));
-
-        results.push_back({maxFlow, numEdges, numAlpha, numStandard});
-
-    } else {
-        for (auto e : current.getAdj()) {
-            Vertex *next = e->getDest();
-            if (!next->isVisited()) {
-                dfs_graphCostHelper(graph, *next, endStation, path, results, maxFlowSoFar);
-            }
-        }
-    }
-
-    current.setVisited(false);
-    path.pop_back();
-}*/
-
-/*
-vector<int> Graph::graphCost(Graph & graph, Vertex startStation, Vertex endStation) {
-    vector<vector<int>> results;
-    vector<int> final;
-    int totalCost = INT_MAX;
-    results = dfs_graphCost(graph, startStation, endStation);
-
-    sort(results.begin(), results.end(), greater<vector<int>>());
-
-    int maxFlow = INT_MIN;
-    for (auto elem: results) {
-        maxFlow = max(maxFlow, elem[0]);
-        if (elem[0] < maxFlow || (elem[2] + elem[3] == 0)) {
-            break;
-        }
-        int temp = elem[2] * 4 + elem[3] * 2; /// SMALL MISTAKE IN DELIVERED VERSION
-        if (temp < totalCost) {
-            totalCost = temp;
-            final = elem;
-        }
-    }
-    if (final.empty()) final = {0, 0, 0, 0};
-    final.push_back(totalCost);
-    return final;
-}
-*/
-/*
-int Graph::getMaxTrains(const std::string &stationName) const {
-    Vertex* targetStation = findVertex(stationName);
-    if (!targetStation) {
-        return -1;
-    }
-
-    int maxFlow = 0;
-
-    for (auto const& vertex : vertexMap) {
-        Vertex* source = vertex.second;
-        if (source != targetStation) {
-            maxFlow += fordFulkerson(source, targetStation);
-        }
-    }
-
-    return maxFlow;
-}*/
-
-int Graph::fordFulkerson(Vertex *source, Vertex *target) const {
-    int maxFlow = 0;
-
-    while (bfs(source, target)) {
-        int bottleneck = getBottleneckCapacity(target);
-
-        updateFlow(target, bottleneck);
-
-        maxFlow += bottleneck;
-    }
-    return maxFlow;
-
-}
-
 void Graph::resetFlows(Graph& graph) {
     for (auto& [_, vertex] : graph.vertexMap) {
         for (auto& edge : vertex->getAdj()) {
@@ -339,17 +226,6 @@ bool Graph::bfs(Vertex *source, Vertex* sink) const {
     }
 
     return false;
-}
-
-int Graph::getBottleneckCapacity(Vertex* sink) {
-    int bottleneck = INT_MAX;
-
-    for (Vertex* v = sink; v->getPath() != nullptr; v = v->getPath()->getOrig()) {
-        Edge* e = v->getPath();
-        bottleneck = min(bottleneck, e->getWeight());
-    }
-
-    return bottleneck;
 }
 
 void Graph::updateFlow(Vertex* sink, int bottleneck) {

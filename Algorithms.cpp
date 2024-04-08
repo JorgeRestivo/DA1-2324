@@ -250,3 +250,96 @@ std::vector<std::pair<std::string, std::string>> Algorithms::processInput(const 
 
     return codePairs;
 }
+
+void Algorithms::createMainSource(Graph& graph, const unordered_map<string, PumpingStation>& pumpingStations) {
+    Vertex* superSource = new Vertex("SuperSource", Type::SUPER_SOURCE);
+    if (!graph.addVertex(superSource)) {
+        std::cerr << "Failed to add super source to graph" << std::endl;
+        delete superSource;  // Clean up if not added to graph
+        return;
+    }
+
+    for (const auto& [code, station] : pumpingStations) {
+        Vertex* stationVertex = graph.findVertex(station.getCode());
+        if (stationVertex) {
+            double totalCapacity = 0;
+            for (Edge* edge : stationVertex->getAdj()) {
+                totalCapacity += edge->getCapacity();  // Aggregate the capacities of outgoing edges
+            }
+            superSource->addEdge(stationVertex, totalCapacity, 1);  // Use the aggregated capacity for the edge
+        } else {
+            std::cerr << "Pumping station vertex not found for code: " << code << std::endl;
+        }
+    }
+}
+
+
+std::vector<std::string> Algorithms::simulatePumpingStationRemoval(Graph& graph, const std::unordered_map<std::string, std::vector<Edge*>>& stationPipes, const std::unordered_map<std::string, City>& cities) {
+    std::vector<std::string> results;
+
+    Vertex* superSource = graph.findVertex("SuperSource");
+    Vertex* superSink = graph.findVertex("SuperSink");
+
+    if (!superSource || !superSink) {
+        std::cerr << "Super source or super sink vertex not found in the graph." << std::endl;
+        return {};
+    }
+
+    // Save the original max flows to all cities
+    graph.resetFlows(graph);
+    double originalMaxFlow = graph.edmondsKarp(superSource, superSink);
+    auto originalFlows = getMaxFlowToCities(graph, cities);
+
+    for (const auto& [stationCode, edges] : stationPipes) {
+        // Store original capacities and set current to 0
+        std::unordered_map<Edge*, double> originalCapacities;
+        for (Edge* edge : edges) {
+            originalCapacities[edge] = edge->getCapacity();
+            edge->setCapacity(0);
+        }
+
+        // Recalculate max flow after the removal of the pumping station
+        graph.resetFlows(graph);
+        double newMaxFlow = graph.edmondsKarp(superSource, superSink);
+        auto newFlows = getMaxFlowToCities(graph, cities);
+
+        // Determine affected cities
+        for (const auto& [cityCode, city] : cities) {
+            double oldFlow = originalFlows[cityCode];
+            double newFlow = newFlows[cityCode];
+            if (newFlow < oldFlow) {
+                double deficit = oldFlow - newFlow;
+                results.push_back(stationCode + " affects " + cityCode + " with a deficit of " + std::to_string(static_cast<int>(deficit)));
+            }
+        }
+
+        // Restore the original capacities of the pipes
+        for (auto& [edge, capacity] : originalCapacities) {
+            edge->setCapacity(capacity);
+        }
+    }
+
+    return results;
+}
+
+std::unordered_map<std::string, std::vector<Edge*>> Algorithms::createStationPipes(Graph& graph) {
+    std::unordered_map<std::string, std::vector<Edge*>> stationPipes;
+
+    // Iterate over vertices in the graph
+    for (const auto& vertexPair : graph.getVertexMap()) {
+        Vertex* vertex = vertexPair.second;
+
+        // Check if the vertex is a pumping station
+        if (vertex->getType() == Type::PUMPING_STATION) {
+            // Get the outgoing edges of the pumping station
+            std::vector<Edge*> edges = vertex->getAdj();
+
+            // Map the pumping station code to its outgoing edges
+            stationPipes[vertex->getCode()] = edges;
+        }
+    }
+
+    return stationPipes;
+}
+
+
