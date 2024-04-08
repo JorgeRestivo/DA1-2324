@@ -18,6 +18,10 @@ public:
     vector<std::string> simulateReservoirRemoval(const std::string& reservoirCode);
     static std::vector<std::string> simulateReservoirRemoval(Graph& graph, const std::string& reservoirCode, const unordered_map<string, Reservoir>& reservoirs, const unordered_map<string, City>& cities);
     static std::unordered_map<std::string, double> getMaxFlowToCities(Graph& graph, const std::unordered_map<std::string, City>& cities);
+    //static std::vector<std::string> simulatePumpingStationRemoval(Graph& graph, const std::unordered_map<string, PumpingStation>& pumpingStations, const std::unordered_map<string, City>& cities);
+
+    static std::vector<std::pair<std::string, std::string>> processInput(const std::string& input);
+    static std::vector<std::string> determinePipelineFailures(Graph& graph, const std::string& input, const std::unordered_map<std::string, City>& cities);
 
     };
 

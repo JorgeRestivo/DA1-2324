@@ -2,6 +2,7 @@
 #include "Algorithms.h"
 #include "Graph.h"
 #include <fstream>
+#include <sstream>
 #include <algorithm>
 using namespace std;
 
@@ -189,4 +190,63 @@ std::unordered_map<std::string, double> Algorithms::getMaxFlowToCities(Graph& gr
     }
 
     return flows;
+}
+
+std::vector<std::string> Algorithms::determinePipelineFailures(Graph& graph, const std::string& input, const std::unordered_map<std::string, City>& cities) {
+    graph.resetFlows(graph);  // Assuming resetFlow is a method that takes a Graph object
+    auto originalFlow = getMaxFlowToCities(graph, cities);
+    graph.resetFlows(graph);
+
+    auto pipeCodes = processInput(input);  // Assuming processInput parses input and returns edge codes
+
+    for (auto& pipeCode : pipeCodes) {
+        std::string code1 = pipeCode.first;
+        std::string code2 = pipeCode.second;
+
+        for (auto& vertexPair : graph.getVertexMap()) {
+            Vertex* vertex = vertexPair.second;
+            for (auto& edge : vertex->getAdj()) {
+                if (edge->getCapacity() <= 0) continue;
+                if ((edge->getOrig()->getCode() != code1 && edge->getDest()->getCode() != code1) ||
+                    (edge->getOrig()->getCode() != code2 && edge->getDest()->getCode() != code2)) continue;
+
+                edge->setCapacity(0);  // Simulate pipeline failure
+            }
+        }
+    }
+
+    auto newFlow = getMaxFlowToCities(graph, cities);
+    graph.resetFlows(graph);  // Reset the flow after simulation
+
+    std::vector<std::string> affectedCities;
+    for (const auto& pair : cities) {
+        const std::string& cityCode = pair.first;
+        const City& city = pair.second;
+        double demand = city.getDemand();  // Assuming City objects have a getDemand method
+
+        if (originalFlow[cityCode] == demand && newFlow[cityCode] < demand) {
+            int newFlowInt = static_cast<int>(newFlow[cityCode]);
+            int originalFlowInt = static_cast<int>(originalFlow[cityCode]);
+            affectedCities.push_back(cityCode + ": " + city.getName() + "- Old flow: " +
+                                     std::to_string(originalFlowInt) + "- New flow: " + std::to_string(newFlowInt));
+        }
+    }
+
+    return affectedCities;
+}
+
+std::vector<std::pair<std::string, std::string>> Algorithms::processInput(const std::string& input) {
+    std::vector<std::pair<std::string, std::string>> codePairs;
+    std::istringstream stream(input);
+    std::string segment;
+
+    while (std::getline(stream, segment, ',')) {
+        std::istringstream pairStream(segment);
+        std::string code1, code2;
+        if (std::getline(pairStream, code1, '-') && std::getline(pairStream, code2)) {
+            codePairs.emplace_back(std::move(code1), std::move(code2));
+        }
+    }
+
+    return codePairs;
 }

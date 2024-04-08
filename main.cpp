@@ -16,6 +16,7 @@ void displayMenu() {
     cout << "1. (2.1) Determine maximum water flow." << endl;
     cout << "2. (2.2) Determine Water Demand Vs Actual Flow" << endl;
     cout << "4. (3.1) Evaluate the impact of removing a reservoir" << endl;
+    cout << "6. (3.3) Evaluate the impact of removing a pumping station" << endl;
 }
 
 void performAction(Graph& graph, int choice, const unordered_map<string, City>& cityMap, const unordered_map<string, Reservoir>& reservoirMap) {
@@ -77,6 +78,25 @@ void performAction(Graph& graph, int choice, const unordered_map<string, City>& 
                 for (const auto& city : affectedCities) {
                     cout << city << endl;
                 }
+            }
+            break;
+        }
+        case 6: {
+            string pipeCode;
+            cout << "Choose a pipe to remove in the format: 'PS_X-PS_Y , PS_Z-PS_W...' " << endl;
+            cin >> pipeCode;
+
+            auto pipelineImpact = Algorithms::determinePipelineFailures(graph, pipeCode, cityMap);
+
+            if (pipelineImpact.empty()) {
+                cout << "No city is affected";
+                break;
+            }
+
+            cout << "Impact of Pipeline Failures on Cities:" << endl;
+
+            for (const auto& impact : pipelineImpact) {
+                cout << impact << endl;
             }
             break;
         }
